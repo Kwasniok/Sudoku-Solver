@@ -9,5 +9,10 @@
 #ifndef config_h
 #define config_h
 
+#ifdef DEBUG
+
+#define SUDOKU_SOLVER_CHECK_VAUE_RANGE
+
+#endif
 
 #endif /* config_h */
