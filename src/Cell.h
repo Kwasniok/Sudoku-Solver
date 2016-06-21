@@ -42,8 +42,8 @@ namespace sudoku_solver {
 		void clear() {_value = 0;}
 		
 		
-		static const value_t get_max_value() {return max_value;}
-		static const char get_empty_representation() {return '_';}
+		static constexpr value_t get_max_value() {return max_value;}
+		static constexpr char get_empty_representation() {return '_';}
 		
 	private:
 		value_t _value = 0;
