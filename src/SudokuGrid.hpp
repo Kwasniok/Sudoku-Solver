@@ -23,8 +23,8 @@ namespace sudoku_solver {
 		
 	public:
 		
-		typedef std::vector<std::vector<cell_t>> grid_t;
-		typedef typename grid_t::size_type index_t;
+		using grid_t = std::vector<std::vector<cell_t>>;
+		using index_t = typename grid_t::size_type ;
 		using get_box_index_t = int (index_t, index_t);
 		
 		Sudoku_Grid(index_t size_x, index_t size_y, int (&box_index_func) (index_t x, index_t y));

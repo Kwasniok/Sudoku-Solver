@@ -22,7 +22,7 @@
 
 namespace sudoku_solver {
 
-	typedef unsigned int value_t;
+	using value_t = unsigned int;
 
 	template <value_t max_value>
 	class Single_Value_Cell {
