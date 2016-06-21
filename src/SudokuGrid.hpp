@@ -24,9 +24,8 @@ namespace sudoku_solver {
 		
 		typedef std::vector<std::vector<cell_t>> grid_t;
 		typedef typename grid_t::size_type index_t;
-		typedef index_t size_t;
 		
-		Sudoku_Grid();
+		Sudoku_Grid(index_t size_x, index_t size_y);
 		Sudoku_Grid(const Sudoku_Grid<cell_t>&) = default;
 		Sudoku_Grid(Sudoku_Grid<cell_t>&&) = default;
 		Sudoku_Grid& operator=(const Sudoku_Grid<cell_t>&) = default;
@@ -37,10 +36,13 @@ namespace sudoku_solver {
 		cell_t& get_cell(const index_t x, const index_t y) throw (std::out_of_range);
 		const cell_t& get_cell(const index_t x, const index_t y) const throw (std::out_of_range);
 		
-		static size_t size() {return cell_t::get_max_value();}
+		index_t size_x() const {return _size_x;}
+		index_t size_y() const {return _size_y;}
 		
 	private:
 		grid_t _grid;
+		index_t _size_x;
+		index_t _size_y;
 	};
 	
 	template<value_t max_value>
@@ -52,12 +54,12 @@ namespace sudoku_solver {
 	std::istream& operator>>(std::istream& is, Sudoku_Grid<cell_t>& sg);
 	
 	template <class cell_t>
-	Sudoku_Grid<cell_t>::Sudoku_Grid() {
-		for (size_t x=0;  x<cell_t::get_max_value(); ++x)
-			_grid.push_back(std::vector<cell_t>(cell_t::get_max_value()));
+	Sudoku_Grid<cell_t>::Sudoku_Grid(index_t size_x, index_t size_y) {
+		for (size_t x=0;  x < size_x; ++x)
+			_grid.push_back(std::vector<cell_t>(size_y));
 		
-		if (_grid.size() != cell_t::get_max_value())
-			_grid.clear();
+		_size_x = size_x;
+		_size_y = size_y;
 	}
 	
 	template <class cell_t>
@@ -82,9 +84,9 @@ namespace sudoku_solver {
 	
 	template<value_t max_value>
 	Sudoku_Grid<Multiple_Value_Cell<max_value>> to_multiple_value_cell_grid(const Sudoku_Grid<Single_Value_Cell<max_value>>& rhs) {
-		Sudoku_Grid<Multiple_Value_Cell<max_value>> tmp;
-		for (int x = 0; x < rhs.size(); ++x) {
-			for (int y = 0; y < rhs.size(); ++y) {
+		Sudoku_Grid<Multiple_Value_Cell<max_value>> tmp {rhs.size_x(), rhs.size_y()};
+		for (int x = 0; x < tmp.size_x(); ++x) {
+			for (int y = 0; y < tmp.size_y(); ++y) {
 				tmp.set_cell(x, y, {{rhs.get_cell(x,y).get_value()}});
 			}
 		}
@@ -94,12 +96,12 @@ namespace sudoku_solver {
 	template<class cell_t>
 	std::ostream& operator<<(std::ostream& os, const Sudoku_Grid<cell_t>& sg) {
 		bool first_x = true;
-		for (int x = 0; x < sg.size(); ++x) {
+		for (int x = 0; x < sg.size_x(); ++x) {
 			if (first_x) first_x = false;
 			else os << std::endl;
 			
 			bool first_y = true;
-			for (int y = 0; y < sg.size(); ++y) {
+			for (int y = 0; y < sg.size_y(); ++y) {
 				if(first_y) first_y = false;
 				else os << ' ';
 				
@@ -111,11 +113,11 @@ namespace sudoku_solver {
 	
 	template<class cell_t>
 	std::istream& operator>>(std::istream& is, Sudoku_Grid<cell_t>& sg) {
-		Sudoku_Grid<cell_t> tmp;
+		Sudoku_Grid<cell_t> tmp {sg.size_x(), sg.size_y()};
 		cell_t cell;
 		
-		for (int x = 0; x < sg.size(); ++x) {
-			for (int y = 0; y < sg.size(); ++y) {
+		for (int x = 0; x < tmp.size_x(); ++x) {
+			for (int y = 0; y < tmp.size_y(); ++y) {
 				is >> cell;
 				tmp.set_cell(x,y, cell);
 			}
