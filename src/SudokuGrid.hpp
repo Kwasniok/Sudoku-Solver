@@ -33,6 +33,7 @@ namespace sudoku_solver {
 		Sudoku_Grid& operator=(Sudoku_Grid<cell_t>&&) = default;
 		
 		void set_cell(const index_t x, const index_t y, const cell_t& c) throw (std::out_of_range);
+		void set_cell(const index_t x, const index_t y, cell_t&& c) throw (std::out_of_range);
 		cell_t& get_cell(const index_t x, const index_t y) throw (std::out_of_range);
 		const cell_t& get_cell(const index_t x, const index_t y) const throw (std::out_of_range);
 		
@@ -62,6 +63,11 @@ namespace sudoku_solver {
 	template <class cell_t>
 	void Sudoku_Grid<cell_t>::set_cell(const index_t x, const index_t y, const cell_t& c) throw(std::out_of_range) {
 		_grid.at(x).at(y) = c;
+	}
+	
+	template <class cell_t>
+	void Sudoku_Grid<cell_t>::set_cell(const index_t x, const index_t y, cell_t&& c) throw(std::out_of_range) {
+		_grid.at(x).at(y) = std::move(c);
 	}
 	
 	template <class cell_t>
