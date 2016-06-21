@@ -38,6 +38,9 @@ namespace sudoku_solver {
 		grid_t _grid;
 	};
 	
+	template<class cell_t>
+	std::ostream& operator<<(std::ostream& os, Sudoku_Grid<cell_t> sg);
+	
 	template <class cell_t>
 	Sudoku_Grid<cell_t>::Sudoku_Grid() {
 		for (size_t x=0;  x<cell_t::get_max_value(); ++x)
