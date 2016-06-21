@@ -42,6 +42,9 @@ namespace sudoku_solver {
 		grid_t _grid;
 	};
 	
+	template<value_t max_value>
+	Sudoku_Grid<Multiple_Value_Cell<max_value>> to_multiple_value_cell_grid(const Sudoku_Grid<Single_Value_Cell<max_value>>& rhs);
+
 	template<class cell_t>
 	std::ostream& operator<<(std::ostream& os, const Sudoku_Grid<cell_t>& sg);
 	template<class cell_t>
@@ -69,6 +72,17 @@ namespace sudoku_solver {
 	template <class cell_t>
 	const cell_t& Sudoku_Grid<cell_t>::get_cell(const index_t x, const index_t y) const throw (std::out_of_range) {
 		return _grid.at(x).at(y);
+	}
+	
+	template<value_t max_value>
+	Sudoku_Grid<Multiple_Value_Cell<max_value>> to_multiple_value_cell_grid(const Sudoku_Grid<Single_Value_Cell<max_value>>& rhs) {
+		Sudoku_Grid<Multiple_Value_Cell<max_value>> tmp;
+		for (int x = 0; x < rhs.size(); ++x) {
+			for (int y = 0; y < rhs.size(); ++y) {
+				tmp.set_cell(x, y, {{rhs.get_cell(x,y).get_value()}});
+			}
+		}
+		return tmp;
 	}
 	
 	template<class cell_t>
