@@ -50,6 +50,11 @@ namespace sudoku_solver {
 		get_box_index_t* _get_box_index;
 	};
 	
+	template<value_t max_value>
+	using Single_Value_Sudoku_Grid = Sudoku_Grid<Single_Value_Cell<max_value>>;
+	template<value_t max_value>
+	using Multiple_Value_Sudoku_Grid = Sudoku_Grid<Multiple_Value_Cell<max_value>>;
+	
 	template <
 		class cell_t,
 		typename Sudoku_Grid<cell_t>::index_t size_x,
