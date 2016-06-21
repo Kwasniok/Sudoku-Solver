@@ -11,6 +11,7 @@
 
 #include <limits>
 #include <vector>
+#include <iostream>
 #include "config.h"
 #include "Cell.h"
 
@@ -59,6 +60,24 @@ namespace sudoku_solver {
 	template <class cell_t>
 	const cell_t& Sudoku_Grid<cell_t>::get_cell(const index_t x, const index_t y) const throw (std::out_of_range) {
 		return _grid.at(x).at(y);
+	}
+	
+	template<class cell_t>
+	std::ostream& operator<<(std::ostream& os, Sudoku_Grid<cell_t> sg) {
+		bool first_x = true;
+		for (int x = 0; x < sg.size(); ++x) {
+			if (first_x) first_x = false;
+			else os << std::endl;
+			
+			bool first_y = true;
+			for (int y = 0; y < sg.size(); ++y) {
+				if(first_y) first_y = false;
+				else os << ' ';
+				
+				os << sg.get_cell(x,y);
+			}
+		}
+		return os;
 	}
 	
 }
