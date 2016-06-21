@@ -39,7 +39,9 @@ namespace sudoku_solver {
 	};
 	
 	template<class cell_t>
-	std::ostream& operator<<(std::ostream& os, Sudoku_Grid<cell_t> sg);
+	std::ostream& operator<<(std::ostream& os, const Sudoku_Grid<cell_t>& sg);
+	template<class cell_t>
+	std::istream& operator>>(std::istream& is, Sudoku_Grid<cell_t>& sg);
 	
 	template <class cell_t>
 	Sudoku_Grid<cell_t>::Sudoku_Grid() {
@@ -66,7 +68,7 @@ namespace sudoku_solver {
 	}
 	
 	template<class cell_t>
-	std::ostream& operator<<(std::ostream& os, Sudoku_Grid<cell_t> sg) {
+	std::ostream& operator<<(std::ostream& os, const Sudoku_Grid<cell_t>& sg) {
 		bool first_x = true;
 		for (int x = 0; x < sg.size(); ++x) {
 			if (first_x) first_x = false;
@@ -81,6 +83,23 @@ namespace sudoku_solver {
 			}
 		}
 		return os;
+	}
+	
+	template<class cell_t>
+	std::istream& operator>>(std::istream& is, Sudoku_Grid<cell_t>& sg) {
+		Sudoku_Grid<cell_t> tmp;
+		cell_t cell;
+		
+		for (int x = 0; x < sg.size(); ++x) {
+			for (int y = 0; y < sg.size(); ++y) {
+				is >> cell;
+				tmp.set_cell(x,y, cell);
+			}
+		}
+		
+		if (is.good())
+			sg = std::move(tmp);
+		return is;
 	}
 	
 }
