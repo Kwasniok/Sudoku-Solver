@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <iostream>
 #include "config.h"
 
 #ifdef SUDOKU_SOLVER_CHECK_VAUE_RANGE
@@ -43,6 +44,11 @@ namespace sudoku_solver {
 		
 	};
 	
+	template<value_t max_value>
+	std::ostream& operator<<(std::ostream& os, const Single_Value_Cell<max_value>& c);
+	template<value_t max_value>
+	std::istream& operator>>(std::istream& is, Single_Value_Cell<max_value>& c);
+	
 
 	template <value_t max_value>
 	struct Multiple_Value_Cell {
@@ -67,6 +73,11 @@ namespace sudoku_solver {
 		std::vector<value_t> _values;
 	};
 	
+	template<value_t max_value>
+	std::ostream& operator<<(std::ostream& os, const Multiple_Value_Cell<max_value>& c);
+	template<value_t max_value>
+	std::istream& operator>>(std::istream& is, Multiple_Value_Cell<max_value>& c);
+	
 	
 	template<value_t max_value>
 	void Single_Value_Cell<max_value>::set_value(value_t v) SUDOKU_SOLVER_VALUE_RANGE_THROW {
@@ -76,8 +87,23 @@ namespace sudoku_solver {
 #endif
 		_value = v;
 	}
-	
-	
+
+	template<value_t max_value>
+	std::ostream& operator<<(std::ostream& os, const Single_Value_Cell<max_value>& c) {
+		return (os << c.get_value());
+	}
+
+	template<value_t max_value>
+	std::istream& operator>>(std::istream& is, Single_Value_Cell<max_value>& c) {
+		Single_Value_Cell<max_value> tmp;
+		value_t v;
+		is >> v;
+		tmp.set_value(v);
+		c = std::move(tmp);
+		return is;
+	}
+
+
 	template<value_t max_value>
 	void Multiple_Value_Cell<max_value>::add_value(value_t v) SUDOKU_SOLVER_VALUE_RANGE_THROW {
 #ifdef SUDOKU_SOLVER_CHECK_VAUE_RANGE
@@ -108,7 +134,43 @@ namespace sudoku_solver {
 #endif
 		_values = vs;
 	}
-	
+
+	template<value_t max_value>
+	std::ostream& operator<<(std::ostream& os, const Multiple_Value_Cell<max_value>& c) {
+		os << '[';
+		bool first = true;
+		for (auto it = c.get_values().begin(); it != c.get_values().end(); ++it) {
+			if (first)
+				first = false;
+			else
+				os << ' ';
+			os << *it;
+		}
+		os << ']';
+		return os;
+	}
+
+	template<value_t max_value>
+	std::istream& operator>>(std::istream& is, Multiple_Value_Cell<max_value>& cell) {
+		Multiple_Value_Cell<max_value> tmp;
+		value_t v;
+		char c;
+		is >> c;
+		if (is.fail() || c != '[') {is.setstate(std::ios_base::failbit | is.rdstate()); return is;}
+		for (;/*ever*/;) {
+			is >> c;
+			if (is.fail()) return is;
+			if (c == ']') break;
+			else {
+				is.putback(c);
+				is >> v;
+				if (is.fail()) return is;
+				tmp.add_value(v);
+ 			}
+		}
+		cell = std::move(tmp);
+		return is;
+	}
 }
 
 #endif /* Cell_h */
