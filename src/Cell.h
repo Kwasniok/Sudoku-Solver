@@ -39,6 +39,7 @@ namespace sudoku_solver {
 		
 		
 		static const value_t get_max_value() {return max_value;}
+		static const char get_empty_representation() {return '_';}
 		
 	private:
 		value_t _value = 0;
@@ -92,16 +93,25 @@ namespace sudoku_solver {
 
 	template<value_t max_value>
 	std::ostream& operator<<(std::ostream& os, const Single_Value_Cell<max_value>& c) {
-		return (os << c.get_value());
+		if (c.is_empty()) os << Single_Value_Cell<max_value>::get_empty_representation();
+		else os << c.get_value();
+		return os;
 	}
 
 	template<value_t max_value>
-	std::istream& operator>>(std::istream& is, Single_Value_Cell<max_value>& c) {
+	std::istream& operator>>(std::istream& is, Single_Value_Cell<max_value>& cell) {
 		Single_Value_Cell<max_value> tmp;
 		value_t v;
-		is >> v;
-		tmp.set_value(v);
-		c = std::move(tmp);
+		char c;
+		is >> c;
+		if (c != Single_Value_Cell<max_value>::get_empty_representation()) {
+			is.putback(c);
+			is >> v;
+			tmp.set_value(v);
+		} else {
+			tmp.clear();
+		}
+		cell = std::move(tmp);
 		return is;
 	}
 
