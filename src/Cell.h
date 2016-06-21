@@ -30,6 +30,10 @@ namespace sudoku_solver {
 	public:
 		Single_Value_Cell() { }
 		Single_Value_Cell(value_t v) : _value(v) { }
+		Single_Value_Cell(const Single_Value_Cell<max_value>&) = default;
+		Single_Value_Cell(Single_Value_Cell<max_value>&&) = default;
+		Single_Value_Cell& operator=(const Single_Value_Cell<max_value>&) = default;
+		Single_Value_Cell& operator=(Single_Value_Cell<max_value>&&) = default;
 		
 		void set_value(value_t v) SUDOKU_SOLVER_VALUE_RANGE_THROW;
 		value_t get_value() const {return _value;}
@@ -58,6 +62,10 @@ namespace sudoku_solver {
 	public:
 		Multiple_Value_Cell() { }
 		Multiple_Value_Cell(std::vector<value_t> values) : _values(values) { }
+		Multiple_Value_Cell(const Multiple_Value_Cell<max_value>&) = default;
+		Multiple_Value_Cell(Multiple_Value_Cell<max_value>&&) = default;
+		Multiple_Value_Cell& operator=(const Multiple_Value_Cell<max_value>&) = default;
+		Multiple_Value_Cell& operator=(Multiple_Value_Cell<max_value>&&) = default;
 		
 		void add_value(value_t v) SUDOKU_SOLVER_VALUE_RANGE_THROW;
 		void remove_value(const value_t v) noexcept;

@@ -27,6 +27,10 @@ namespace sudoku_solver {
 		typedef index_t size_t;
 		
 		Sudoku_Grid();
+		Sudoku_Grid(const Sudoku_Grid<cell_t>&) = default;
+		Sudoku_Grid(Sudoku_Grid<cell_t>&&) = default;
+		Sudoku_Grid& operator=(const Sudoku_Grid<cell_t>&) = default;
+		Sudoku_Grid& operator=(Sudoku_Grid<cell_t>&&) = default;
 		
 		void set_cell(const index_t x, const index_t y, const cell_t& c) throw (std::out_of_range);
 		cell_t& get_cell(const index_t x, const index_t y) throw (std::out_of_range);
