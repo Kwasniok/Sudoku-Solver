@@ -34,7 +34,7 @@ namespace sudoku_solver {
 		void set_value(value_t v) SUDOKU_SOLVER_VALUE_RANGE_THROW;
 		value_t get_value() const {return _value;}
 		
-		bool is_empty() {return _value == 0;}
+		bool is_empty() const {return _value == 0;}
 		void clear() {_value = 0;}
 		
 		
@@ -65,7 +65,7 @@ namespace sudoku_solver {
 		std::vector<value_t>& get_values() {return _values;}
 		const std::vector<value_t>& get_values() const {return _values;}
 		
-		bool is_empty() {return _values.empty();}
+		bool is_empty() const {return _values.empty();}
 		void clear() {_values.clear();}
 		
 		
