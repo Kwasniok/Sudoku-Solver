@@ -159,6 +159,18 @@ namespace sudoku_solver {
 		_values = vs;
 	}
 
+#ifdef SUDOKU_SOLVER_CELL_PRINT_DETAILED
+	template<value_t max_value>
+	std::ostream& operator<<(std::ostream& os, const Multiple_Value_Cell<max_value>& c) {
+		os << '[';
+		for (value_t v = 1 ; v <= max_value; ++v) {
+			if (has_value(c.get_values(), v)) os << v;
+			else os << ' ';
+		}
+		os << ']';
+		return os;
+	}
+#else
 	template<value_t max_value>
 	std::ostream& operator<<(std::ostream& os, const Multiple_Value_Cell<max_value>& c) {
 		os << '[';
@@ -173,6 +185,7 @@ namespace sudoku_solver {
 		os << ']';
 		return os;
 	}
+#endif
 
 	template<value_t max_value>
 	std::istream& operator>>(std::istream& is, Multiple_Value_Cell<max_value>& cell) {
