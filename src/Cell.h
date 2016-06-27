@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <iostream>
 #include "config.h"
+#include "util.h"
 
 #ifdef SUDOKU_SOLVER_CHECK_VAUE_RANGE
 #define SUDOKU_SOLVER_VALUE_RANGE_THROW throw (std::out_of_range)
@@ -75,6 +76,8 @@ namespace sudoku_solver {
 		const std::vector<value_t>& get_values() const {return _values;}
 		
 		bool is_empty() const {return _values.empty();}
+		void make_final() {_final = true;}
+		bool is_final() const {return _final;}
 		void clear() {_values.clear();}
 		
 		
@@ -82,6 +85,7 @@ namespace sudoku_solver {
 		
 	private:
 		std::vector<value_t> _values;
+		bool _final = false;
 	};
 	
 	template<value_t max_value>
