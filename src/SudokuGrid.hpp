@@ -11,7 +11,6 @@
 
 #include <limits>
 #include <vector>
-#include <map>
 #include <iostream>
 #include "config.h"
 #include "Cell.h"
@@ -142,7 +141,7 @@ namespace sudoku_solver {
 		typename Sudoku_Grid<cell_t>::index_t size_y
 	>
 	int std_box_index_func(typename Sudoku_Grid<cell_t>::index_t x, typename Sudoku_Grid<cell_t>::index_t y) {
-		return int((x/size_x)*size_y + (y/size_y));
+		return int((x/size_x) * size_y + (y/size_y)); // rounding intended!
 	}
 	
 	template<value_t max_value>
