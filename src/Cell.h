@@ -63,6 +63,7 @@ namespace sudoku_solver {
 	public:
 		Multiple_Value_Cell() { }
 		Multiple_Value_Cell(std::vector<value_t> values) : _values(values) { }
+		Multiple_Value_Cell(value_t value) : _values({value}) { }
 		Multiple_Value_Cell(const Multiple_Value_Cell<max_value>&) = default;
 		Multiple_Value_Cell(Multiple_Value_Cell<max_value>&&) = default;
 		Multiple_Value_Cell& operator=(const Multiple_Value_Cell<max_value>&) = default;
