@@ -123,25 +123,42 @@ namespace sudoku_solver {
 					}
 				}
 			}
-			
-			if (cont && changes == 0) {
-				for (int i=2; i <= max_value; ++i) {
-					for (int x = 0; x < mg.size_x(); ++x) {
-						for (int y = 0; y < mg.size_y(); ++y) {
-							if (mg.get_cell(x,y).get_values().size() == i) {
-								for(value_t v : mg.get_cell(x,y).get_values()) {
-									Multiple_Value_Sudoku_Grid<max_value> mg_assumption = mg;
-									removed(mg_assumption.get_cell(x,y).get_values(), v);
-									
-									++branch_count;
-									if (branch_count % 10000 == 0) std::cout << branch_count << std::endl;
-									_solve_ret_t<max_value> ret = _solve(std::move(mg_assumption), boxes, lines_x, lines_y);
-									
-									if (ret.solved)
-										return std::move(ret);
-								}
+		}
+		
+		
+		//TODO: need improved selection for assumptions
+		// too much (identical) choices
+		// II: cancle one value by pure assumption
+		while (cont) {
+			for (int i=2; i <= max_value; ++i) {
+				for (int x = 0; x < mg.size_x(); ++x) {
+					for (int y = 0; y < mg.size_y(); ++y) {
+						
+						if (mg.get_cell(x,y).get_values().size() == i) {
+							
+							for(value_t v : mg.get_cell(x,y).get_values()) {
+								
+								Multiple_Value_Sudoku_Grid<max_value> mg_assumption = mg;
+								removed(mg_assumption.get_cell(x,y).get_values(), v); // remove one value
+								
+								++branch_count;
+								if (branch_count % 10000 == 0) std::cout << branch_count << std::endl;
+								
+								_solve_ret_t<max_value> ret = _solve(std::move(mg_assumption), boxes, lines_x, lines_y);
+								
+								if (ret.solved)
+									return std::move(ret);
 							}
 						}
+					}
+				}
+			}
+			
+			cont = false;
+			for (int x = 0; !cont && x < mg.size_x(); ++x) {
+				for (int y = 0; !cont && y < mg.size_y(); ++y) {
+					if (!mg.get_cell(x,y).is_final()) {
+						cont = true;
 					}
 				}
 			}
