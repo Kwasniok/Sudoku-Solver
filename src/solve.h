@@ -165,8 +165,14 @@ namespace sudoku_solver {
 		
 		for (int x = 0; x < tmp.size_x(); ++x) {
 			for (int y = 0; y < tmp.size_x(); ++y) {
-				if (rhs.get_cell(x,y).is_empty()) tmp.set_cell(x, y, invert(rhs.get_cell(x,y)));
-				else tmp.set_cell(x, y, {{rhs.get_cell(x, y).get_value()}});
+				
+				if (rhs.get_cell(x,y).is_empty()) {
+					tmp.set_cell(x, y, invert(rhs.get_cell(x,y)));
+				} else {
+					Multiple_Value_Cell<max_value> mc {rhs.get_cell(x, y).get_value()};
+					tmp.set_cell(x, y, mc);
+				}
+				
 			}
 		}
 		return tmp;
