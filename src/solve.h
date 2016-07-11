@@ -28,9 +28,12 @@ namespace sudoku_solver {
 	// auxiliar
 	template<value_t max_value>
 	Multiple_Value_Cell<max_value> invert(const Single_Value_Cell<max_value>& rhs);
+	
 	template<value_t max_value>
 	Multiple_Value_Sudoku_Grid<max_value> create_possibility_grid(const Single_Value_Sudoku_Grid<max_value>& rhs);
 
+	
+	
 	unsigned long branch_count = 0;
 	template<value_t max_value>
 	Multiple_Value_Sudoku_Grid<max_value> solve(const Single_Value_Sudoku_Grid<max_value>& sg_start) {
@@ -46,21 +49,26 @@ namespace sudoku_solver {
 	_solve_ret_t<max_value> _solve(Multiple_Value_Sudoku_Grid<max_value>&& mg_start, std::map<int, std::vector<value_t>> boxes, std::map<int, std::vector<value_t>> lines_x, std::map<int, std::vector<value_t>> lines_y) {
 		Multiple_Value_Sudoku_Grid<max_value> mg {std::move(mg_start)};
 		
-		// reduce possibilities via 'box counting'
 		const typename Multiple_Value_Sudoku_Grid<max_value>::get_box_index_t& to_box_index = mg.get_box_index_func();
 		
 		bool cont = true;
-		unsigned int changes = 0;
-		while (cont) {
-			// I: store final values per box / line
+		unsigned int changes = 1;
+		while (changes != 0) {
+			
+			// Ia: analyze cells for final values (via box and lines)
 			for (int x = 0; x < mg.size_x(); ++x) {
 				for (int y = 0; y < mg.size_y(); ++y) {
+					
 					Multiple_Value_Cell<max_value>& cell = mg.get_cell(x,y);
+					
+					// if just one value left but not marked final yet
 					if (!cell.is_final() && cell.get_values().size() == 1) {
+						
 						value_t v = cell.get_values()[0];
 						std::vector<value_t>& box = boxes[to_box_index(x,y)];
 						std::vector<value_t>& line_x = lines_x[x];
 						std::vector<value_t>& line_y = lines_y[y];
+						
 						if(has_value(box, v))
 							return {std::move(mg), false, "same value in box"};
 						else
@@ -81,14 +89,17 @@ namespace sudoku_solver {
 				}
 			}
 			
-			// II: cancel no longer possible values
+			// Ib: cancel no longer possible values
 			cont = false;
 			changes = 0;
 			for (int x = 0; x < mg.size_x(); ++x) {
 				for (int y = 0; y < mg.size_y(); ++y) {
+					
 					Multiple_Value_Cell<max_value>& cell = mg.get_cell(x,y);
 					std::vector<value_t>& cell_vs = cell.get_values();
+					
 					if (!cell.is_final()) {
+						
 						for (value_t v : boxes[to_box_index(x,y)]) {
 							if (removed(cell_vs, v))
 								++changes;
@@ -105,7 +116,7 @@ namespace sudoku_solver {
 						if (cell.is_empty())
 							return {std::move(mg), false, "no possible value for cell"};
 						if (!cell.is_final())
-							cont = true;
+							cont = true; // at least one cell is not final
 						
 						//std::cout << mg << std::endl << std::endl;
 						//std::cout.flush();
@@ -149,7 +160,9 @@ namespace sudoku_solver {
 	
 	template<value_t max_value>
 	Multiple_Value_Sudoku_Grid<max_value> create_possibility_grid(const Single_Value_Sudoku_Grid<max_value>& rhs) {
+		
 		Multiple_Value_Sudoku_Grid<max_value> tmp {rhs.size_x(), rhs.size_y(), rhs.get_box_index_func()};
+		
 		for (int x = 0; x < tmp.size_x(); ++x) {
 			for (int y = 0; y < tmp.size_x(); ++y) {
 				if (rhs.get_cell(x,y).is_empty()) tmp.set_cell(x, y, invert(rhs.get_cell(x,y)));
