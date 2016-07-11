@@ -20,7 +20,8 @@ namespace sudoku_solver {
 	Multiple_Value_Sudoku_Grid<max_value> solve(const Single_Value_Sudoku_Grid<max_value>& sg_start);
 	
 	template<value_t max_value>
-	struct _solve_ret_t {Multiple_Value_Sudoku_Grid<max_value> grid; bool solved=false;};
+	struct _solve_ret_t {Multiple_Value_Sudoku_Grid<max_value> grid; bool solved=false; std::string reason;};
+	
 	template<value_t max_value>
 	_solve_ret_t<max_value> _solve(Multiple_Value_Sudoku_Grid<max_value>&& mg_start, std::map<int, std::vector<value_t>> boxes, std::map<int, std::vector<value_t>> lines_x, std::map<int, std::vector<value_t>> lines_y);
 	
@@ -36,8 +37,9 @@ namespace sudoku_solver {
 		Multiple_Value_Sudoku_Grid<max_value> mg {create_possibility_grid(sg_start)};
 		
 		branch_count = 0;
-		
-		return std::move(_solve(std::move(mg), {}, {}, {}).grid);
+		_solve_ret_t<max_value> mg_solved = _solve(std::move(mg), {}, {}, {});
+		std::cout << mg_solved.reason << std::endl;
+		return std::move(mg_solved.grid);
 	}
 	
 	template<value_t max_value>
@@ -60,17 +62,17 @@ namespace sudoku_solver {
 						std::vector<value_t>& line_x = lines_x[x];
 						std::vector<value_t>& line_y = lines_y[y];
 						if(has_value(box, v))
-							return {std::move(mg), false};
+							return {std::move(mg), false, "same value in box"};
 						else
 							box.push_back(v);
 						
 						if(has_value(line_x, v))
-							return {std::move(mg), false};
+							return {std::move(mg), false, "same value in vertical line"};
 						else
 							line_x.push_back(v);
 						
 						if(has_value(line_y, v))
-							return {std::move(mg), false};
+							return {std::move(mg), false, "same value in horizontal line"};
 						else
 							line_y.push_back(v);
 						
@@ -101,7 +103,7 @@ namespace sudoku_solver {
 						}
 						
 						if (cell.is_empty())
-							return {std::move(mg), false};
+							return {std::move(mg), false, "no possible value for cell"};
 						if (!cell.is_final())
 							cont = true;
 						
@@ -134,8 +136,7 @@ namespace sudoku_solver {
 			}
 		}
 		
-		std::cout << "solved" << std::endl;
-		return {std::move(mg), true};
+		return {std::move(mg), true, "solved"};
 	}
 
 	template<value_t max_value>
