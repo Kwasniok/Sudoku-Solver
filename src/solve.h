@@ -132,7 +132,7 @@ namespace sudoku_solver {
 									_solve_ret_t ret = _solve(std::move(mg_assumption), max_value, boxes, lines_x, lines_y);
 									
 									if (ret.solved)
-										return std::move(ret);
+										return ret;
 								}
 							}
 						}
