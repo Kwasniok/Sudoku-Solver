@@ -145,7 +145,7 @@ namespace sudoku_solver {
 		Sudoku_Grid<Multiple_Value_Cell> tmp {rhs.size_x(), rhs.size_y(), rhs.get_box_index_func()};
 		for (int x = 0; x < tmp.size_x(); ++x) {
 			for (int y = 0; y < tmp.size_y(); ++y) {
-				tmp.set_cell(x, y, {{rhs.get_cell(x,y).get_value()}});
+				tmp.set_cell(x, y, {rhs.get_cell(x,y).get_value()});
 			}
 		}
 		return tmp;

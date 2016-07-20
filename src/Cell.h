@@ -126,17 +126,6 @@ namespace sudoku_solver {
 		_values = vs;
 	}
 
-#ifdef SUDOKU_SOLVER_CELL_PRINT_DETAILED
-	std::ostream& operator<<(std::ostream& os, const Multiple_Value_Cell& c) {
-		os << '[';
-		for (value_t v = 1 ; v <= max_value; ++v) {
-			if (has_value(c.get_values(), v)) os << v;
-			else os << ' ';
-		}
-		os << ']';
-		return os;
-	}
-#else
 	std::ostream& operator<<(std::ostream& os, const Multiple_Value_Cell& c) {
 		os << '[';
 		bool first = true;
@@ -150,7 +139,6 @@ namespace sudoku_solver {
 		os << ']';
 		return os;
 	}
-#endif
 
 	std::istream& operator>>(std::istream& is, Multiple_Value_Cell& cell) {
 		Multiple_Value_Cell tmp;

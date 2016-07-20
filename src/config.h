@@ -11,9 +11,6 @@
 
 #ifdef DEBUG
 
-#define SUDOKU_SOLVER_CHECK_VAUE_RANGE
-#define SUDOKU_SOLVER_CELL_PRINT_DETAILED
-
 #endif
 
 #endif /* config_h */
