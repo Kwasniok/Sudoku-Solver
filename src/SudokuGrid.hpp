@@ -49,10 +49,8 @@ namespace sudoku_solver {
 		get_box_index_t* _get_box_index;
 	};
 	
-	template<value_t max_value>
-	using Single_Value_Sudoku_Grid = Sudoku_Grid<Single_Value_Cell<max_value>>;
-	template<value_t max_value>
-	using Multiple_Value_Sudoku_Grid = Sudoku_Grid<Multiple_Value_Cell<max_value>>;
+	using Single_Value_Sudoku_Grid = Sudoku_Grid<Single_Value_Cell>;
+	using  Multiple_Value_Sudoku_Grid = Sudoku_Grid<Multiple_Value_Cell>;
 	
 	template <
 		class cell_t,
@@ -61,8 +59,7 @@ namespace sudoku_solver {
 	>
 	int std_box_index_func(typename Sudoku_Grid<cell_t>::index_t x, typename Sudoku_Grid<cell_t>::index_t y);
 	
-	template<value_t max_value>
-	Sudoku_Grid<Multiple_Value_Cell<max_value>> to_multiple_value_cell_grid(const Sudoku_Grid<Single_Value_Cell<max_value>>& rhs);
+	Sudoku_Grid<Multiple_Value_Cell> to_multiple_value_cell_grid(const Sudoku_Grid<Single_Value_Cell>& rhs);
 
 	template<class cell_t>
 	std::ostream& operator<<(std::ostream& os, const Sudoku_Grid<cell_t>& sg);
@@ -144,9 +141,8 @@ namespace sudoku_solver {
 		return int((x/size_x) * size_y + (y/size_y)); // rounding intended!
 	}
 	
-	template<value_t max_value>
-	Sudoku_Grid<Multiple_Value_Cell<max_value>> to_multiple_value_cell_grid(const Sudoku_Grid<Single_Value_Cell<max_value>>& rhs) {
-		Sudoku_Grid<Multiple_Value_Cell<max_value>> tmp {rhs.size_x(), rhs.size_y(), rhs.get_box_index_func()};
+	Sudoku_Grid<Multiple_Value_Cell> to_multiple_value_cell_grid(const Sudoku_Grid<Single_Value_Cell>& rhs) {
+		Sudoku_Grid<Multiple_Value_Cell> tmp {rhs.size_x(), rhs.size_y(), rhs.get_box_index_func()};
 		for (int x = 0; x < tmp.size_x(); ++x) {
 			for (int y = 0; y < tmp.size_y(); ++y) {
 				tmp.set_cell(x, y, {{rhs.get_cell(x,y).get_value()}});
