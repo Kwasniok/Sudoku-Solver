@@ -15,6 +15,16 @@
 
 namespace sudoku_solver {
 	
+	template <class cell_t>
+	class Sudoku_Grid;
+	
+	template <
+		class cell_t,
+		typename Sudoku_Grid<cell_t>::index_t box_size_x,
+		typename Sudoku_Grid<cell_t>::index_t box_size_y
+	>
+	int std_box_index_func(typename Sudoku_Grid<cell_t>::index_t x, typename Sudoku_Grid<cell_t>::index_t y);
+	
 	//! template for single or multiple valued cell grids
 	template <class cell_t>
 	class Sudoku_Grid {
@@ -26,7 +36,7 @@ namespace sudoku_solver {
 		//! tpye of a function which maps each cell cooridinate to the index of its box
 		using get_box_index_t = int (index_t, index_t);
 		
-		Sudoku_Grid(index_t size_x, index_t size_y, int (&box_index_func) (index_t x, index_t y));
+		Sudoku_Grid(index_t size_x=9, index_t size_y=9, int (&box_index_func) (index_t x, index_t y) = std_box_index_func<cell_t, 3, 3>);
 		Sudoku_Grid(const Sudoku_Grid<cell_t>&);
 		Sudoku_Grid(Sudoku_Grid<cell_t>&&);
 		Sudoku_Grid& operator=(const Sudoku_Grid<cell_t>&);
@@ -57,15 +67,6 @@ namespace sudoku_solver {
 	
 	using Single_Value_Sudoku_Grid = Sudoku_Grid<Single_Value_Cell>;
 	using  Multiple_Value_Sudoku_Grid = Sudoku_Grid<Multiple_Value_Cell>;
-	
-	
-	
-	template <
-		class cell_t,
-		typename Sudoku_Grid<cell_t>::index_t size_x,
-		typename Sudoku_Grid<cell_t>::index_t size_y
-	>
-	int std_box_index_func(typename Sudoku_Grid<cell_t>::index_t x, typename Sudoku_Grid<cell_t>::index_t y);
 	
 	Multiple_Value_Sudoku_Grid to_multiple_value_cell_grid(const Single_Value_Sudoku_Grid& rhs);
 
@@ -172,11 +173,11 @@ namespace sudoku_solver {
 	
 	template <
 		class cell_t,
-		typename Sudoku_Grid<cell_t>::index_t size_x,
-		typename Sudoku_Grid<cell_t>::index_t size_y
+		typename Sudoku_Grid<cell_t>::index_t box_size_x,
+		typename Sudoku_Grid<cell_t>::index_t box_size_y
 	>
 	int std_box_index_func(typename Sudoku_Grid<cell_t>::index_t x, typename Sudoku_Grid<cell_t>::index_t y) {
-		return int((x/size_x) * size_y + (y/size_y)); // rounding intended!
+		return int((x/box_size_x) * box_size_y + (y/box_size_y)); // rounding intended!
 	}
 	
 	Multiple_Value_Sudoku_Grid to_multiple_value_cell_grid(const Single_Value_Sudoku_Grid& rhs) {
