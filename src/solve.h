@@ -24,14 +24,12 @@ namespace sudoku_solver {
 		struct _solve_ret_t {Multiple_Value_Sudoku_Grid grid; bool solved=false; std::string reason;};
 		_solve_ret_t _solve(Multiple_Value_Sudoku_Grid&& mg_start, value_t max_value, std::map<int, std::vector<value_t>> boxes, std::map<int, std::vector<value_t>> lines_x, std::map<int, std::vector<value_t>> lines_y);
 		Multiple_Value_Sudoku_Grid create_possibility_grid(const Single_Value_Sudoku_Grid& rhs, value_t max_value);
-		unsigned long branch_count = 0;
 	}
 	
 
 	Multiple_Value_Sudoku_Grid solve(const Single_Value_Sudoku_Grid& sg_start, value_t max_value) {
 		Multiple_Value_Sudoku_Grid mg {create_possibility_grid(sg_start, max_value)};
 		
-		branch_count = 0;
 		_solve_ret_t mg_solved = _solve(std::move(mg), max_value, {}, {}, {});
 		std::cout << mg_solved.reason << std::endl;
 		return std::move(mg_solved.grid);
@@ -119,7 +117,7 @@ namespace sudoku_solver {
 			//TODO: need improved selection for assumptions
 			// too much (identical) choices
 			// II: cancle one value by pure assumption
-			while (cont) {
+			if (cont) {
 				for (int i=2; i <= max_value; ++i) {
 					for (int x = 0; x < mg.size_x(); ++x) {
 						for (int y = 0; y < mg.size_y(); ++y) {
@@ -131,9 +129,6 @@ namespace sudoku_solver {
 									Multiple_Value_Sudoku_Grid mg_assumption = mg;
 									removed(mg_assumption.get_cell(x,y).get_values(), v); // remove one value
 									
-									++branch_count;
-									if (branch_count % 10000 == 0) std::cout << branch_count << std::endl;
-									
 									_solve_ret_t ret = _solve(std::move(mg_assumption), max_value, boxes, lines_x, lines_y);
 									
 									if (ret.solved)
@@ -143,14 +138,12 @@ namespace sudoku_solver {
 						}
 					}
 				}
-				
-				cont = false;
-				for (int x = 0; !cont && x < mg.size_x(); ++x) {
-					for (int y = 0; !cont && y < mg.size_y(); ++y) {
-						if (!mg.get_cell(x,y).is_final()) {
-							cont = true;
-						}
-					}
+			}
+			
+			for (int x = 0; x < mg.size_x(); ++x) {
+				for (int y = 0; y < mg.size_y(); ++y) {
+					if (!mg.get_cell(x,y).is_final())
+						return {std::move(mg), false, "no possibility left"};
 				}
 			}
 			
