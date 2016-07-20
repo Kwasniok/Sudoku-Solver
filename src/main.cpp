@@ -25,7 +25,7 @@ int main(int argc, const char * argv[]) {
 		 << endl << "1 _ _ _ _ 8 3 _ _"
 		 << endl << "8 _ _ 6 5 _ _ _ 1"
 		 << endl << "_ 7 _ _ _ 4 6 _ 5"
-		 << endl << "9 _ 5 1 _ _ _ 8 4" << endl;
+		 << endl << "9 _ 5 1 _ _ _ 8 4" << endl << endl;
 
 	cin >> sg;
 	cout << (cin.good()? "accepted":"failed reading")  << endl << endl;
