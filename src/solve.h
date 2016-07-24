@@ -11,7 +11,7 @@
 
 #include <iostream>
 #include <map>
-#include "SudokuGrid.hpp"
+#include "SudokuGrid.h"
 #include "util.h"
 
 namespace sudoku_solver {
@@ -111,6 +111,9 @@ namespace sudoku_solver {
 						}
 					}
 				}
+				
+				print_grid(std::cout, mg, max_value);
+				std::cout << std::endl << std::endl;
 			}
 			
 			

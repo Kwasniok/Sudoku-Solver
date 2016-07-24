@@ -60,13 +60,14 @@ namespace sudoku_solver {
 		get_box_index_t* _get_box_index;
 	};
 	
+	
+	using Single_Value_Sudoku_Grid = Sudoku_Grid<Single_Value_Cell>;
+	using  Multiple_Value_Sudoku_Grid = Sudoku_Grid<Multiple_Value_Cell>;
+	
 	template<class cell_t>
 	std::ostream& operator<<(std::ostream& os, const Sudoku_Grid<cell_t>& sg);
 	template<class cell_t>
 	std::istream& operator>>(std::istream& is, Sudoku_Grid<cell_t>& sg);
-	
-	using Single_Value_Sudoku_Grid = Sudoku_Grid<Single_Value_Cell>;
-	using  Multiple_Value_Sudoku_Grid = Sudoku_Grid<Multiple_Value_Cell>;
 	
 	Multiple_Value_Sudoku_Grid to_multiple_value_cell_grid(const Single_Value_Sudoku_Grid& rhs);
 
@@ -179,16 +180,7 @@ namespace sudoku_solver {
 	int std_box_index_func(typename Sudoku_Grid<cell_t>::index_t x, typename Sudoku_Grid<cell_t>::index_t y) {
 		return int((x/box_size_x) * box_size_y + (y/box_size_y)); // rounding intended!
 	}
-	
-	Multiple_Value_Sudoku_Grid to_multiple_value_cell_grid(const Single_Value_Sudoku_Grid& rhs) {
-		Multiple_Value_Sudoku_Grid tmp {rhs.size_x(), rhs.size_y(), rhs.get_box_index_func()};
-		for (int x = 0; x < tmp.size_x(); ++x) {
-			for (int y = 0; y < tmp.size_y(); ++y) {
-				tmp.set_cell(x, y, {rhs.get_cell(x,y).get_value()});
-			}
-		}
-		return tmp;
-	}
+
 }
 
 #endif /* SudokuGrid_hpp */
