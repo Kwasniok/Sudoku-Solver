@@ -68,6 +68,7 @@ namespace sudoku_solver {
 	std::ostream& operator<<(std::ostream& os, const Sudoku_Grid<cell_t>& sg);
 	template<class cell_t>
 	std::istream& operator>>(std::istream& is, Sudoku_Grid<cell_t>& sg);
+	void print_grid(std::ostream& os, const Multiple_Value_Sudoku_Grid& g, const value_t max_value);
 	
 	Multiple_Value_Sudoku_Grid to_multiple_value_cell_grid(const Single_Value_Sudoku_Grid& rhs);
 
