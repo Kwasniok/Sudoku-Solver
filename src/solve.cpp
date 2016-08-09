@@ -28,13 +28,14 @@ namespace sudoku_solver {
 	//! recursive implementation of solving algoritm
 	_solve_ret_t _solve(Multiple_Value_Sudoku_Grid&& mg_start,
 						value_t max_value,
+						int box_size,
 						std::map<int, std::vector<value_t>> boxes,
 						std::map<int, std::vector<value_t>> lines_x,
 						std::map<int, std::vector<value_t>> lines_y);
 
 
 	
-	Multiple_Value_Sudoku_Grid solve(const Single_Value_Sudoku_Grid& sg_start, value_t max_value) {
+	Multiple_Value_Sudoku_Grid solve(const Single_Value_Sudoku_Grid& sg_start, value_t max_value, int box_size) {
 		
 		// convert (single valued) sudoku grid into initial grid with multiple value support
 		// this new grid contains a sigle value for each original cell with a value
@@ -42,7 +43,7 @@ namespace sudoku_solver {
 		Multiple_Value_Sudoku_Grid mg {create_possibility_grid(sg_start, max_value)};
 		
 		// call to recursive solving algorithm
-		_solve_ret_t mg_solved = _solve(std::move(mg), max_value, {}, {}, {});
+		_solve_ret_t mg_solved = _solve(std::move(mg), max_value, box_size, {}, {}, {});
 		
 		// prints the reason why the solving algorithm finished
 		// either 'solved' or a contradiction message (e.g. 'same value in box')
@@ -52,10 +53,23 @@ namespace sudoku_solver {
 		// the grid might be in an unsolved state
 		return std::move(mg_solved.grid);
 	}
+	
+	int to_box_index(long x, long y, int box_size) {
+		return int((x/box_size) * box_size + (y/box_size)); // rounding intended!
+	}
+
+	//! returns the coords of the uppper left cell in the box with index b
+	std::pair<int, int> box_to_cell_coords(int b, int box_size, long grid_size) {
+		int box_per_line = int(grid_size / box_size);
+		int b_x = b / box_per_line;
+		int b_y = b % box_per_line;
+		return {b_x * box_size, b_y * box_size};
+	}
 
 		
 	_solve_ret_t _solve(Multiple_Value_Sudoku_Grid&& mg_start,
 						value_t max_value,
+						int box_size,
 						std::map<int, std::vector<value_t>> boxes,
 						std::map<int, std::vector<value_t>> lines_x,
 						std::map<int, std::vector<value_t>> lines_y)
@@ -99,7 +113,7 @@ namespace sudoku_solver {
 						
 						// shortcuts to cell and sections
 						value_t v = cell.get_values()[0];
-						std::vector<value_t>& box = boxes[to_box_index(x,y)];
+						std::vector<value_t>& box = boxes[to_box_index(x, y, box_size)];
 						std::vector<value_t>& line_x = lines_x[x];
 						std::vector<value_t>& line_y = lines_y[y];
 						
@@ -139,7 +153,7 @@ namespace sudoku_solver {
 						
 						// try to remove the values stored as used in all sections of the cell
 						// if the remove was possible increment the counter
-						for (value_t v : boxes[to_box_index(x,y)]) {
+						for (value_t v : boxes[to_box_index(x, y, box_size)]) {
 							if (removed(cell_vs, v))
 								++removed_possibilities;
 						}
@@ -197,7 +211,7 @@ namespace sudoku_solver {
 								removed(mg_assumption.get_cell(x,y).get_values(), v);
 								
 								// call to solving algorithm for the copy (copies used values in sections implicitly)
-								_solve_ret_t ret = _solve(std::move(mg_assumption), max_value, boxes, lines_x, lines_y);
+								_solve_ret_t ret = _solve(std::move(mg_assumption), max_value, box_size, boxes, lines_x, lines_y);
 								
 								// if the copied grid was solved sucessfully return the solution
 								if (ret.solved)
