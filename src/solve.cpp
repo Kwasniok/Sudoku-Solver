@@ -103,12 +103,13 @@ namespace sudoku_solver {
 			removed_possibilities = 0;
 			
 			// Ia: analyze cells for final values (via box and lines)
+			
+			// Ia.a: find cell with one value left but not marked as final
 			for (int x = 0; x < mg.size_x(); ++x) {
 				for (int y = 0; y < mg.size_y(); ++y) {
 					
 					Multiple_Value_Cell& cell = mg.get_cell(x,y);
 					
-					// find cell with one value left but not marked as final
 					if (!cell.is_final() && cell.get_values().size() == 1) {
 						
 						// shortcuts to cell and sections
@@ -138,6 +139,177 @@ namespace sudoku_solver {
 						cell.make_final();
 					}
 				}
+			}
+			
+			// Ia.b: find single occurrence of a value in a section
+			
+			// for each value
+			for (value_t v = 1; v <= max_value; ++v) {
+				
+				bool value_occurred_once;
+				int cell_pos_x, cell_pos_y;
+				
+				// by vertical line
+				for (int x = 0; x < mg.size_x(); ++x) {
+					
+					if (!has_value(lines_x[x], v)) {
+						
+						value_occurred_once = false;
+						
+						for (int y = 0; y < mg.size_y(); ++y) {
+							
+							if (has_value(mg.get_cell(x, y).get_values(), v)) {
+								
+								if (value_occurred_once) {value_occurred_once = false; break;} // occurred twice
+								value_occurred_once = true;
+								cell_pos_x = x;
+								cell_pos_y = y;
+								
+							}
+						}
+						
+						if (value_occurred_once) {
+								
+							// shortcuts to cell & sections
+							Multiple_Value_Cell& c = mg.get_cell(cell_pos_x, cell_pos_y);
+							std::vector<value_t>& box = boxes[to_box_index(cell_pos_x, cell_pos_y, box_size)];
+							std::vector<value_t>& line_x = lines_x[cell_pos_x];
+							std::vector<value_t>& line_y = lines_y[cell_pos_y];
+							
+							// check for contradictions and stop if one occurred
+							// or store final value as used in section and continue
+							if(has_value(box, v))
+								return {std::move(mg), false, "same value in box"};
+							else
+								box.push_back(v);
+							
+							line_x.push_back(v);
+							
+							if(has_value(line_y, v))
+								return {std::move(mg), false, "same value in horizontal line"};
+							else
+								line_y.push_back(v);
+							
+							// cancel all other possible values for this cell
+							c.set_values({v});
+							// mark cell as final
+							c.make_final();
+						}
+						
+					}
+					
+				}
+				
+				// by horizontal line
+				for (int y = 0; y < mg.size_y(); ++y) {
+					
+					if (!has_value(lines_y[y], v)) {
+						
+						value_occurred_once = false;
+						
+						for (int x = 0; x < mg.size_x(); ++x) {
+							
+							if (has_value(mg.get_cell(x, y).get_values(), v)) {
+								
+								if (value_occurred_once) {value_occurred_once = false; break;} // occurred twice
+								value_occurred_once = true;
+								cell_pos_x = x;
+								cell_pos_y = y;
+								
+							}
+						}
+						
+						if (value_occurred_once) {
+							
+							// shortcuts to cell & sections
+							Multiple_Value_Cell& c = mg.get_cell(cell_pos_x, cell_pos_y);
+							std::vector<value_t>& box = boxes[to_box_index(cell_pos_x, cell_pos_y, box_size)];
+							std::vector<value_t>& line_x = lines_x[cell_pos_x];
+							std::vector<value_t>& line_y = lines_y[cell_pos_y];
+							
+							// check for contradictions and stop if one occurred
+							// or store final value as used in section and continue
+							if(has_value(box, v))
+								return {std::move(mg), false, "same value in box"};
+							else
+								box.push_back(v);
+							
+							if(has_value(line_x, v))
+								return {std::move(mg), false, "same value in vertical line"};
+							else
+								line_x.push_back(v);
+
+								line_y.push_back(v);
+							
+							// cancel all other possible values for this cell
+							c.set_values({v});
+							// mark cell as final
+							c.make_final();
+						}
+						
+					}
+					
+				}
+				
+				// by box
+				for (int b = 0; b < (mg.size_x() / box_size) * (mg.size_x() / box_size) ; ++b) {
+					
+					if (!has_value(boxes[b], v)) {
+						
+						value_occurred_once = false;
+						
+						std::pair<int, int> c_coord_box = box_to_cell_coords(b, box_size, mg.size_x());
+						int x_box = c_coord_box.first;
+						int y_box = c_coord_box.second;
+						
+						bool brk = false; // brk (break)
+						for (int x_rel = 0; !brk && x_rel < box_size; ++x_rel) {
+							for (int y_rel = 0; y_rel < box_size; ++y_rel) {
+						
+							
+								if (has_value(mg.get_cell(x_box + x_rel, y_box + y_rel).get_values(), v)) {
+									
+									if (value_occurred_once) {value_occurred_once = false; brk = true; break;} // occurred twice
+									value_occurred_once = true;
+									cell_pos_x = x_box + x_rel;
+									cell_pos_y = y_box + y_rel;
+									
+								}
+							}
+						}
+						
+						if (value_occurred_once) {
+							
+							// shortcuts to cell & sections
+							Multiple_Value_Cell& c = mg.get_cell(cell_pos_x, cell_pos_y);
+							std::vector<value_t>& box = boxes[to_box_index(cell_pos_x, cell_pos_y, box_size)];
+							std::vector<value_t>& line_x = lines_x[cell_pos_x];
+							std::vector<value_t>& line_y = lines_y[cell_pos_y];
+							
+							// check for contradictions and stop if one occurred
+							// or store final value as used in section and continue
+							box.push_back(v);
+							
+							if(has_value(line_x, v))
+								return {std::move(mg), false, "same value in vertical line"};
+							else
+								line_x.push_back(v);
+							
+							if(has_value(line_y, v))
+								return {std::move(mg), false, "same value in horizontal line"};
+							else
+								line_y.push_back(v);
+							
+							// cancel all other possible values for this cell
+							c.set_values({v});
+							// mark cell as final
+							c.make_final();
+						}
+						
+					}
+					
+				}
+			
 			}
 			
 			// Ib: cancel no longer possible values
