@@ -62,9 +62,6 @@ namespace sudoku_solver {
 	{
 		Multiple_Value_Sudoku_Grid mg {std::move(mg_start)};
 		
-		// shortcut to the box indexing function
-		typename Multiple_Value_Sudoku_Grid::get_box_index_t& to_box_index = mg.get_box_index_func();
-		
 		// synopsis:
 		//
 		// step I:
@@ -233,7 +230,7 @@ namespace sudoku_solver {
 
 	Multiple_Value_Sudoku_Grid create_possibility_grid(const Single_Value_Sudoku_Grid& rhs, value_t max_value) {
 		
-		Multiple_Value_Sudoku_Grid tmp {rhs.size_x(), rhs.size_y(), rhs.get_box_index_func()};
+		Multiple_Value_Sudoku_Grid tmp {rhs.size_x(), rhs.size_y()};
 		
 		for (int x = 0; x < tmp.size_x(); ++x) {
 			for (int y = 0; y < tmp.size_x(); ++y) {

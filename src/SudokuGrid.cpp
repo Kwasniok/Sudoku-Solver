@@ -37,7 +37,7 @@ void sudoku_solver::print_grid(std::ostream& os, const Multiple_Value_Sudoku_Gri
 }
 
 Multiple_Value_Sudoku_Grid sudoku_solver::to_multiple_value_cell_grid(const Single_Value_Sudoku_Grid& rhs) {
-	Multiple_Value_Sudoku_Grid tmp {rhs.size_x(), rhs.size_y(), rhs.get_box_index_func()};
+	Multiple_Value_Sudoku_Grid tmp {rhs.size_x(), rhs.size_y()};
 	for (int x = 0; x < tmp.size_x(); ++x) {
 		for (int y = 0; y < tmp.size_y(); ++y) {
 			tmp.set_cell(x, y, {rhs.get_cell(x,y).get_value()});

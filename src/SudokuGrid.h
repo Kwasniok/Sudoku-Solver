@@ -18,13 +18,6 @@ namespace sudoku_solver {
 	template <class cell_t>
 	class Sudoku_Grid;
 	
-	template <
-		class cell_t,
-		typename Sudoku_Grid<cell_t>::index_t box_size_x,
-		typename Sudoku_Grid<cell_t>::index_t box_size_y
-	>
-	int std_box_index_func(typename Sudoku_Grid<cell_t>::index_t x, typename Sudoku_Grid<cell_t>::index_t y);
-	
 	//! template for single or multiple valued cell grids
 	template <class cell_t>
 	class Sudoku_Grid {
@@ -33,10 +26,8 @@ namespace sudoku_solver {
 		
 		using grid_t = std::vector<std::vector<cell_t>>;
 		using index_t = typename grid_t::size_type ;
-		//! tpye of a function which maps each cell cooridinate to the index of its box
-		using get_box_index_t = int (index_t, index_t);
 		
-		Sudoku_Grid(index_t size_x=9, index_t size_y=9, int (&box_index_func) (index_t x, index_t y) = std_box_index_func<cell_t, 3, 3>);
+		Sudoku_Grid(index_t size_x=9, index_t size_y=9);
 		Sudoku_Grid(const Sudoku_Grid<cell_t>&);
 		Sudoku_Grid(Sudoku_Grid<cell_t>&&);
 		Sudoku_Grid& operator=(const Sudoku_Grid<cell_t>&);
@@ -50,14 +41,10 @@ namespace sudoku_solver {
 		index_t size_x() const {return _size_x;}
 		index_t size_y() const {return _size_y;}
 		
-		//! @return a function which maps each cell cooridinate to the index of its box
-		get_box_index_t& get_box_index_func() const {return *_get_box_index;}
-		
 	private:
 		grid_t _grid;
 		index_t _size_x;
 		index_t _size_y;
-		get_box_index_t* _get_box_index;
 	};
 	
 	
@@ -73,8 +60,7 @@ namespace sudoku_solver {
 	Multiple_Value_Sudoku_Grid to_multiple_value_cell_grid(const Single_Value_Sudoku_Grid& rhs);
 
 	template <class cell_t>
-	Sudoku_Grid<cell_t>::Sudoku_Grid(index_t size_x, index_t size_y, int (&box_index_func) (index_t x, index_t y))
-	: _get_box_index(box_index_func) {
+	Sudoku_Grid<cell_t>::Sudoku_Grid(index_t size_x, index_t size_y) {
 		for (size_t x=0;  x < size_x; ++x)
 			_grid.push_back(std::vector<cell_t>(size_y));
 		
@@ -84,16 +70,15 @@ namespace sudoku_solver {
 	
 	template <class cell_t>
 	Sudoku_Grid<cell_t>::Sudoku_Grid(const Sudoku_Grid<cell_t>& rhs)
-	: _grid(rhs._grid), _size_x(rhs._size_x), _size_y(rhs._size_y), _get_box_index(rhs._get_box_index)
+	: _grid(rhs._grid), _size_x(rhs._size_x), _size_y(rhs._size_y)
 	{ }
 	
 	template <class cell_t>
 	Sudoku_Grid<cell_t>::Sudoku_Grid(Sudoku_Grid<cell_t>&& rhs)
-	: _grid(std::move(rhs._grid)), _size_x(rhs._size_x), _size_y(rhs._size_y), _get_box_index(rhs._get_box_index)
+	: _grid(std::move(rhs._grid)), _size_x(rhs._size_x), _size_y(rhs._size_y)
 	{
 		rhs._size_x = 0;
 		rhs._size_y = 0;
-		rhs._get_box_index = nullptr;
 	}
 	
 	template <class cell_t>
@@ -113,7 +98,6 @@ namespace sudoku_solver {
 		_size_y = rhs._size_y;
 		rhs._size_x = 0;
 		rhs._size_y = 0;
-		rhs._get_box_index = nullptr;
 		
 		return *this;
 	}
@@ -158,7 +142,7 @@ namespace sudoku_solver {
 	
 	template<class cell_t>
 	std::istream& operator>>(std::istream& is, Sudoku_Grid<cell_t>& sg) {
-		Sudoku_Grid<cell_t> tmp {sg.size_x(), sg.size_y(), sg.get_box_index_func()};
+		Sudoku_Grid<cell_t> tmp {sg.size_x(), sg.size_y()};
 		cell_t cell;
 		
 		for (int x = 0; x < tmp.size_x(); ++x) {
@@ -171,15 +155,6 @@ namespace sudoku_solver {
 		if (is.good())
 			sg = std::move(tmp);
 		return is;
-	}
-	
-	template <
-		class cell_t,
-		typename Sudoku_Grid<cell_t>::index_t box_size_x,
-		typename Sudoku_Grid<cell_t>::index_t box_size_y
-	>
-	int std_box_index_func(typename Sudoku_Grid<cell_t>::index_t x, typename Sudoku_Grid<cell_t>::index_t y) {
-		return int((x/box_size_x) * box_size_y + (y/box_size_y)); // rounding intended!
 	}
 
 }
