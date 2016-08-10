@@ -14,6 +14,7 @@ using namespace sudoku_solver;
 
 void sudoku_solver::print_grid(std::ostream& os, const Multiple_Value_Sudoku_Grid& g, const value_t max_value) {
 	bool first_x = true;
+	int non_final_possibilities = 0;
 	for (int x = 0; x < g.size(); ++x) {
 		if (first_x) first_x = false;
 		else os << std::endl;
@@ -30,10 +31,14 @@ void sudoku_solver::print_grid(std::ostream& os, const Multiple_Value_Sudoku_Gri
 					os << v;
 				else
 					os << ' ';
+				if (!c.is_final())
+					++non_final_possibilities;
 			}
 			os << ']';
 		}
 	}
+	os << std::endl << "non-final possibilities: " << non_final_possibilities
+	   << std::endl << "solved by " << (1.0f - float(non_final_possibilities) / float(max_value*max_value*max_value)) * 100.0f << "%";
 }
 
 Multiple_Value_Sudoku_Grid sudoku_solver::to_multiple_value_cell_grid(const Single_Value_Sudoku_Grid& rhs) {
