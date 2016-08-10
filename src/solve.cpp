@@ -105,8 +105,8 @@ namespace sudoku_solver {
 			// Ia: analyze cells for final values (via box and lines)
 			
 			// Ia.a: find cell with one value left but not marked as final
-			for (int x = 0; x < mg.size_x(); ++x) {
-				for (int y = 0; y < mg.size_y(); ++y) {
+			for (int x = 0; x < mg.size(); ++x) {
+				for (int y = 0; y < mg.size(); ++y) {
 					
 					Multiple_Value_Cell& cell = mg.get_cell(x,y);
 					
@@ -150,13 +150,13 @@ namespace sudoku_solver {
 				int cell_pos_x, cell_pos_y;
 				
 				// by vertical line
-				for (int x = 0; x < mg.size_x(); ++x) {
+				for (int x = 0; x < mg.size(); ++x) {
 					
 					if (!has_value(lines_x[x], v)) {
 						
 						value_occurred_once = false;
 						
-						for (int y = 0; y < mg.size_y(); ++y) {
+						for (int y = 0; y < mg.size(); ++y) {
 							
 							if (has_value(mg.get_cell(x, y).get_values(), v)) {
 								
@@ -201,13 +201,13 @@ namespace sudoku_solver {
 				}
 				
 				// by horizontal line
-				for (int y = 0; y < mg.size_y(); ++y) {
+				for (int y = 0; y < mg.size(); ++y) {
 					
 					if (!has_value(lines_y[y], v)) {
 						
 						value_occurred_once = false;
 						
-						for (int x = 0; x < mg.size_x(); ++x) {
+						for (int x = 0; x < mg.size(); ++x) {
 							
 							if (has_value(mg.get_cell(x, y).get_values(), v)) {
 								
@@ -252,13 +252,13 @@ namespace sudoku_solver {
 				}
 				
 				// by box
-				for (int b = 0; b < (mg.size_x() / box_size) * (mg.size_x() / box_size) ; ++b) {
+				for (int b = 0; b < (mg.size() / box_size) * (mg.size() / box_size) ; ++b) {
 					
 					if (!has_value(boxes[b], v)) {
 						
 						value_occurred_once = false;
 						
-						std::pair<int, int> c_coord_box = box_to_cell_coords(b, box_size, mg.size_x());
+						std::pair<int, int> c_coord_box = box_to_cell_coords(b, box_size, mg.size());
 						int x_box = c_coord_box.first;
 						int y_box = c_coord_box.second;
 						
@@ -313,8 +313,8 @@ namespace sudoku_solver {
 			}
 			
 			// Ib: cancel no longer possible values
-			for (int x = 0; x < mg.size_x(); ++x) {
-				for (int y = 0; y < mg.size_y(); ++y) {
+			for (int x = 0; x < mg.size(); ++x) {
+				for (int y = 0; y < mg.size(); ++y) {
 					
 					// shortcuts to cell and its values
 					Multiple_Value_Cell& cell = mg.get_cell(x,y);
@@ -368,8 +368,8 @@ namespace sudoku_solver {
 			// for each possibility to cancle a non-final value
 			// (cells with fewer possibilities are chosen first)
 			for (int i=2; i <= max_value; ++i) {
-				for (int x = 0; x < mg.size_x(); ++x) {
-					for (int y = 0; y < mg.size_y(); ++y) {
+				for (int x = 0; x < mg.size(); ++x) {
+					for (int y = 0; y < mg.size(); ++y) {
 						
 						if (mg.get_cell(x,y).get_values().size() == i) {
 							
@@ -416,10 +416,10 @@ namespace sudoku_solver {
 
 	Multiple_Value_Sudoku_Grid create_possibility_grid(const Single_Value_Sudoku_Grid& rhs, value_t max_value) {
 		
-		Multiple_Value_Sudoku_Grid tmp {rhs.size_x(), rhs.size_y()};
+		Multiple_Value_Sudoku_Grid tmp {rhs.size()};
 		
-		for (int x = 0; x < tmp.size_x(); ++x) {
-			for (int y = 0; y < tmp.size_x(); ++y) {
+		for (int x = 0; x < tmp.size(); ++x) {
+			for (int y = 0; y < tmp.size(); ++y) {
 				
 				if (rhs.get_cell(x,y).is_empty()) {
 					tmp.set_cell(x, y, invert(rhs.get_cell(x,y), max_value));
