@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <chrono>
 #include "solve.h"
 
 using namespace std;
@@ -14,7 +15,7 @@ using namespace sudoku_solver;
 
 int main(int argc, const char * argv[]) {
 	
-	Single_Value_Sudoku_Grid sg;
+	Single_Value_Sudoku_Grid sg(4*4);
 	cout << "Enter your sudoku grid ..." << endl;
 	cout << "example: "
 		 << endl << "5 3 _ _ _ 2 1 _ 6"
@@ -31,10 +32,13 @@ int main(int argc, const char * argv[]) {
 	cout << (cin.good()? "accepted":"failed reading")  << endl << endl;
 	
 	if (cin.good()) {
+		auto start = chrono::system_clock::now();
 		Multiple_Value_Sudoku_Grid result = solve(sg);
-		
+		auto stop = chrono::system_clock::now();
+		auto delta_t = chrono::duration_cast<chrono::milliseconds>(stop - start);
+
 		print_grid(cout, result);
 		
-		cout << endl << endl << "result:" << endl << result << endl;
+		cout << endl << endl << "result: (time " << delta_t.count() << "ms)" << endl << result << endl;
 	}
 }
