@@ -45,7 +45,8 @@ Multiple_Value_Sudoku_Grid sudoku_solver::to_multiple_value_cell_grid(const Sing
 	Multiple_Value_Sudoku_Grid tmp {rhs.size()};
 	for (int x = 0; x < tmp.size(); ++x) {
 		for (int y = 0; y < tmp.size(); ++y) {
-			tmp.set_cell(x, y, {rhs.get_cell(x,y).get_value()});
+			if (!rhs.get_cell(x,y).is_empty())
+				tmp.set_cell(x, y, {rhs.get_cell(x,y).get_value()});
 		}
 	}
 	return tmp;
