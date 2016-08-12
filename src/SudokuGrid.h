@@ -39,8 +39,11 @@ namespace sudoku_solver {
 		cell_t& get_cell(const index_t x, const index_t y) throw (std::out_of_range);
 		const cell_t& get_cell(const index_t x, const index_t y) const throw (std::out_of_range);
 		
+		//! @return the dimension of the grid (same as max value in grid)
 		unsigned int size() const {return _size;}
+		//! @return dimension of one box in the grid (same as square root of size and amount of boxes in a row resp. column)
 		unsigned int box_size() const {return _box_size;}
+		//!@return true if all cells are marked as final
 		bool solved() const;
 		
 		//! @return index of the cells box
@@ -65,6 +68,7 @@ namespace sudoku_solver {
 	std::istream& operator>>(std::istream& is, Sudoku_Grid<cell_t>& sg);
 	void print_grid(std::ostream& os, const Multiple_Value_Sudoku_Grid& g);
 	
+	//! Converts a single valued grid to a mutlivalued grid.
 	Multiple_Value_Sudoku_Grid to_multiple_value_cell_grid(const Single_Value_Sudoku_Grid& rhs);
 
 	template <class cell_t>

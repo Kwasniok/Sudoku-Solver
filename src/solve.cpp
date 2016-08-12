@@ -61,19 +61,28 @@ namespace sudoku_solver {
 		
 		// synopsis:
 		//
-		// step I:
-		//    a:
-		//    analyze grid (find unchecked cells with only one possibility)
-		//    for each such cell:
-		//        mark the value as used for its box and lines
-		//        mark it as final
-		//    b:
-		//    cancel no longer possible values form all cells
+		// step I: (analytical part)
 		//
-		// step II:
+		//    a: find final cells
+		//    a.a: find unchecked cells with only one possibility
+		//        for each such cell:
+		//            mark the value as used for its box and lines
+		//            mark it as final
+		//    a.b: find single occurrence of a value in a section
+		//        makr those cells as final
+		//    both sub-steps might return with a contradiction
+		//
+		//    b: cancel possibilities
+		//    b.a: cancel no longer possible values form all cells
+		//    b.b: cancles possibilities due to 'blocking' of a value whose position in one box is fixed to one line
+		//
+		//
+		// step II: (assumption based part)
+		//
 		//    for each possibility in a non-final cell:
 		//        apply the solving algorithm to a copy with just one possibility cancled out
 		//    return (solved or contradictory) grid
+		//
 		
 		// decides whether step II is applied
 		bool grid_not_final;

@@ -36,7 +36,7 @@ namespace sudoku_solver {
 		bool is_final() const {return _value != 0;}
 		void clear() {_value = 0;}
 		
-		
+		//! returns the value used to mark empty cells in string representations
 		static constexpr char get_empty_representation() {return '_';}
 		
 	private:
