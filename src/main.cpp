@@ -30,6 +30,11 @@ int main(int argc, const char * argv[]) {
 	cin >> sg;
 	cout << (cin.good()? "accepted":"failed reading")  << endl << endl;
 	
-	if (cin.good())
-		cout << solve(sg) << endl;
+	if (cin.good()) {
+		Multiple_Value_Sudoku_Grid result = solve(sg);
+		
+		print_grid(cout, result);
+		
+		cout << endl << endl << "result:" << endl << result << endl;
+	}
 }
