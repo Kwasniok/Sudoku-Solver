@@ -37,7 +37,8 @@ int main(int argc, const char * argv[]) {
 		auto stop = chrono::system_clock::now();
 		auto delta_t = chrono::duration_cast<chrono::milliseconds>(stop - start);
 
-		print_grid(cout, result);
+		if (!result.solved())
+			print_grid(cout, result);
 		
 		cout << endl << endl << "result: (time " << delta_t.count() << "ms)" << endl << result << endl;
 	}
