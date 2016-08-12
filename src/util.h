@@ -30,4 +30,9 @@ inline bool removed(std::vector<V>& c, const V& v) {
 	return false;
 }
 
+template<class V>
+inline void remove(std::vector<V>& c, const V& v) {
+	removed(c, v);
+}
+
 #endif /* util_h */
