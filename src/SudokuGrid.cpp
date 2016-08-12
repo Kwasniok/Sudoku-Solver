@@ -12,7 +12,7 @@
 
 using namespace sudoku_solver;
 
-void sudoku_solver::print_grid(std::ostream& os, const Multiple_Value_Sudoku_Grid& g, const value_t max_value) {
+void sudoku_solver::print_grid(std::ostream& os, const Multiple_Value_Sudoku_Grid& g) {
 	bool first_x = true;
 	int non_final_possibilities = 0;
 	for (int x = 0; x < g.size(); ++x) {
@@ -25,7 +25,7 @@ void sudoku_solver::print_grid(std::ostream& os, const Multiple_Value_Sudoku_Gri
 			else os << ' ';
 			
 			os << '[';
-			for (value_t v=1; v <= max_value; ++v) {
+			for (value_t v=1; v <= g.size(); ++v) {
 				const Multiple_Value_Cell& c = g.get_cell(x,y);
 				if (has_value(c.get_values(), v))
 					os << v;
@@ -38,7 +38,7 @@ void sudoku_solver::print_grid(std::ostream& os, const Multiple_Value_Sudoku_Gri
 		}
 	}
 	os << std::endl << "non-final possibilities: " << non_final_possibilities
-	   << std::endl << "solved by " << (1.0f - float(non_final_possibilities) / float(max_value*max_value*max_value)) * 100.0f << "%";
+	   << std::endl << "solved by " << (1.0f - float(non_final_possibilities) / float(g.size()*g.size()*g.size())) * 100.0f << "%";
 }
 
 Multiple_Value_Sudoku_Grid sudoku_solver::to_multiple_value_cell_grid(const Single_Value_Sudoku_Grid& rhs) {

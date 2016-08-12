@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <iostream>
+#include <math.h>
 #include "Cell.h"
 
 namespace sudoku_solver {
@@ -27,7 +28,7 @@ namespace sudoku_solver {
 		using grid_t = std::vector<std::vector<cell_t>>;
 		using index_t = typename grid_t::size_type ;
 		
-		Sudoku_Grid(index_t size=9);
+		Sudoku_Grid(unsigned int size=9);
 		Sudoku_Grid(const Sudoku_Grid<cell_t>&);
 		Sudoku_Grid(Sudoku_Grid<cell_t>&&);
 		Sudoku_Grid& operator=(const Sudoku_Grid<cell_t>&);
@@ -38,11 +39,19 @@ namespace sudoku_solver {
 		cell_t& get_cell(const index_t x, const index_t y) throw (std::out_of_range);
 		const cell_t& get_cell(const index_t x, const index_t y) const throw (std::out_of_range);
 		
-		index_t size() const {return _size;}
+		unsigned int size() const {return _size;}
+		unsigned int box_size() const {return _box_size;}
+		
+		//! @return index of the cells box
+		int get_box_index(index_t cell_x, index_t cell_y) const;
+		//! @return coords of the uppper left cell in the box with index box_index
+		std::pair<index_t, index_t> get_left_top_cell_coord_of_box(int box_index) const;
 		
 	private:
+		
 		grid_t _grid;
-		index_t _size;
+		unsigned int _size = 0;
+		unsigned int _box_size = 0;
 	};
 	
 	
@@ -53,34 +62,45 @@ namespace sudoku_solver {
 	std::ostream& operator<<(std::ostream& os, const Sudoku_Grid<cell_t>& sg);
 	template<class cell_t>
 	std::istream& operator>>(std::istream& is, Sudoku_Grid<cell_t>& sg);
-	void print_grid(std::ostream& os, const Multiple_Value_Sudoku_Grid& g, const value_t max_value);
+	void print_grid(std::ostream& os, const Multiple_Value_Sudoku_Grid& g);
 	
 	Multiple_Value_Sudoku_Grid to_multiple_value_cell_grid(const Single_Value_Sudoku_Grid& rhs);
 
 	template <class cell_t>
-	Sudoku_Grid<cell_t>::Sudoku_Grid(index_t size) {
-		for (size_t x=0;  x < size; ++x)
+	Sudoku_Grid<cell_t>::Sudoku_Grid(unsigned int size) {
+		
+		unsigned box_size = (unsigned int) (sqrt(double(size)));
+		
+		if (box_size*box_size != size) {
+			std::cout << "cannot create sudoku grid with size " << size << "(size must be a square)" << std::endl;
+			return;
+		}
+		
+		for (unsigned int  x = 0;  x < size; ++x)
 			_grid.push_back(std::vector<cell_t>(size));
 		
 		_size = size;
+		_box_size = box_size;
 	}
 	
 	template <class cell_t>
 	Sudoku_Grid<cell_t>::Sudoku_Grid(const Sudoku_Grid<cell_t>& rhs)
-	: _grid(rhs._grid), _size(rhs._size)
+	: _grid(rhs._grid), _size(rhs._size), _box_size(rhs._box_size)
 	{ }
 	
 	template <class cell_t>
 	Sudoku_Grid<cell_t>::Sudoku_Grid(Sudoku_Grid<cell_t>&& rhs)
-	: _grid(std::move(rhs._grid)), _size(rhs._size)
+	: _grid(std::move(rhs._grid)), _size(rhs._size), _box_size(rhs._box_size)
 	{
 		rhs._size = 0;
+		rhs._box_size = 0;
 	}
 	
 	template <class cell_t>
 	Sudoku_Grid<cell_t>& Sudoku_Grid<cell_t>::operator=(const Sudoku_Grid<cell_t>& rhs) {
 		_grid = rhs._grid;
 		_size = rhs._size;
+		_box_size = rhs._box_size;
 		
 		return *this;
 	}
@@ -90,7 +110,9 @@ namespace sudoku_solver {
 	{
 		_grid = std::move(rhs._grid);
 		_size = rhs._size;
+		_box_size = rhs._box_size;
 		rhs._size = 0;
+		rhs._box_size = 0;
 		
 		return *this;
 	}
@@ -113,6 +135,19 @@ namespace sudoku_solver {
 	template <class cell_t>
 	const cell_t& Sudoku_Grid<cell_t>::get_cell(const index_t x, const index_t y) const throw (std::out_of_range) {
 		return _grid.at(x).at(y);
+	}
+	template <class cell_t>
+	int Sudoku_Grid<cell_t>::get_box_index(index_t x, index_t y) const {
+		return int((x/_box_size) * _box_size + (y/_box_size)); // rounding intended!
+	}
+	
+	template <class cell_t>
+	std::pair<typename Sudoku_Grid<cell_t>::index_t, typename Sudoku_Grid<cell_t>::index_t>
+	Sudoku_Grid<cell_t>::get_left_top_cell_coord_of_box(int b) const {
+		int box_per_line = int(_size / _box_size);
+		int b_x = b / box_per_line;
+		int b_y = b % box_per_line;
+		return {b_x * _box_size, b_y * _box_size};
 	}
 	
 	template<class cell_t>
