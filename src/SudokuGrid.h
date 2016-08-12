@@ -176,6 +176,12 @@ namespace sudoku_solver {
 		for (int x = 0; x < tmp.size(); ++x) {
 			for (int y = 0; y < tmp.size(); ++y) {
 				is >> cell;
+				
+				if (cell.max_value () > sg.size()) {
+					is.setstate(std::ios::failbit);
+					return is;
+				}
+				
 				tmp.set_cell(x,y, cell);
 			}
 		}
