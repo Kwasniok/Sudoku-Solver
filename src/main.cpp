@@ -15,9 +15,9 @@ using namespace sudoku_solver;
 
 int main(int argc, const char * argv[]) {
 	
-	Single_Value_Sudoku_Grid sg(4*4);
-	cout << "Enter your sudoku grid ..." << endl;
-	cout << "example: "
+	Single_Value_Sudoku_Grid sg;
+	cout << "Enter your sudoku grid of dimension " << sg.size() << "x" << sg.size() << " ..." << endl;
+	cout << "example of a 9x9 grid: "
 		 << endl << "5 3 _ _ _ 2 1 _ 6"
 		 << endl << "_ _ 7 3 _ _ _ _ _"
 		 << endl << "2 _ _ _ 7 6 8 _ _"
