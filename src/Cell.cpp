@@ -7,6 +7,7 @@
 //
 
 #include "Cell.h"
+#include <algorithm>
 
 using namespace sudoku_solver;
 
@@ -49,6 +50,10 @@ void Multiple_Value_Cell::remove_value(const value_t v) noexcept {
 
 void Multiple_Value_Cell::set_values(std::vector<value_t> vs) {
 	_values = vs;
+}
+
+value_t Multiple_Value_Cell::max_value() const {
+	return *std::max(_values.begin(), _values.end());
 }
 
 std::ostream& sudoku_solver::operator<<(std::ostream& os, const Multiple_Value_Cell& c) {

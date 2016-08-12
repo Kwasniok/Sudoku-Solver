@@ -30,6 +30,7 @@ namespace sudoku_solver {
 		
 		void set_value(value_t v) {_value = v;};
 		value_t get_value() const {return _value;}
+		value_t max_value() const {return _value;}
 		
 		bool is_empty() const {return _value == 0;}
 		void clear() {_value = 0;}
@@ -64,6 +65,7 @@ namespace sudoku_solver {
 		void set_values(std::vector<value_t> vs);
 		std::vector<value_t>& get_values() {return _values;}
 		const std::vector<value_t>& get_values() const {return _values;}
+		value_t max_value() const;
 		
 		bool is_empty() const {return _values.empty();}
 		void make_final() {_final = true;}
