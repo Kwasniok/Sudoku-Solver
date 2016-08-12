@@ -33,6 +33,7 @@ namespace sudoku_solver {
 		value_t max_value() const {return _value;}
 		
 		bool is_empty() const {return _value == 0;}
+		bool is_final() const {return _value != 0;}
 		void clear() {_value = 0;}
 		
 		

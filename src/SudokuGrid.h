@@ -41,6 +41,7 @@ namespace sudoku_solver {
 		
 		unsigned int size() const {return _size;}
 		unsigned int box_size() const {return _box_size;}
+		bool solved() const;
 		
 		//! @return index of the cells box
 		int get_box_index(index_t cell_x, index_t cell_y) const;
@@ -136,6 +137,19 @@ namespace sudoku_solver {
 	const cell_t& Sudoku_Grid<cell_t>::get_cell(const index_t x, const index_t y) const throw (std::out_of_range) {
 		return _grid.at(x).at(y);
 	}
+	
+	template <class cell_t>
+	bool Sudoku_Grid<cell_t>::solved() const {
+		for (int x = 0; x < size(); ++x) {
+			for (int y = 0; y < size(); ++y) {
+				if (!get_cell(x, y).is_final())
+					return false;
+			}
+		}
+		return true;
+	}
+	
+	
 	template <class cell_t>
 	int Sudoku_Grid<cell_t>::get_box_index(index_t x, index_t y) const {
 		return int((x/_box_size) * _box_size + (y/_box_size)); // rounding intended!
