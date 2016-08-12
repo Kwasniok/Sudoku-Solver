@@ -295,7 +295,7 @@ namespace sudoku_solver {
 			
 			}
 			
-			// Ib: cancel no longer possible values
+			// Ib.a: cancel no longer possible values (due to final values)
 			for (int x = 0; x < mg.size(); ++x) {
 				for (int y = 0; y < mg.size(); ++y) {
 					
@@ -329,6 +329,109 @@ namespace sudoku_solver {
 						if (!cell.is_final())
 							grid_not_final = true;
 					}
+				}
+			}
+			
+			// Ib.b cancles possibilities due to 'blocking' of a value whose position in one box is fixed to one line
+			// for each box
+			for (int b_x = 0; b_x < mg.box_size(); ++b_x) {
+				for (int b_y = 0; b_y < mg.box_size(); ++b_y) {
+					
+					std::vector<std::vector<value_t>> line_x_rel (mg.box_size());
+					std::vector<std::vector<value_t>> line_y_rel (mg.box_size());
+					
+					// for each cell in this box (coords relative to top left cell in box)
+					for (int x_rel = 0; x_rel < mg.box_size(); ++x_rel) {
+						for (int y_rel = 0; y_rel < mg.box_size(); ++y_rel) {
+							
+							Multiple_Value_Cell& c = mg.get_cell(b_x * mg.box_size() + x_rel, b_y * mg.box_size() + y_rel);
+							
+							for (value_t v : c.get_values()) {
+								
+								if (!has_value(line_x_rel[x_rel], v))
+									line_x_rel[x_rel].push_back(v);
+								
+								if (!has_value(line_y_rel[y_rel], v))
+									line_y_rel[y_rel].push_back(v);
+							}
+						}
+					}
+					
+					// histogramms to analyze the frequency of a value mapped onto lines
+					std::map<value_t, int> histogramm_x;
+					std::map<value_t, int> histogramm_y;
+					
+					// for each line increment the fequency for every such value
+					for (int i_rel = 0; i_rel < mg.box_size(); ++i_rel) {
+						for (value_t v : line_x_rel[i_rel])
+							++histogramm_x[v];
+						for (value_t v : line_y_rel[i_rel])
+							++histogramm_y[v];
+					}
+					
+					// find values which occurre in only one line (frequency of one)
+					// and store them
+					std::vector<value_t> single_values_x;
+					std::vector<value_t> single_values_y;
+					for (auto& v : histogramm_x) {
+						if (v.second == 1)
+							single_values_x.push_back(v.first);
+					}
+					for (auto& v : histogramm_y) {
+						if (v.second == 1)
+							single_values_y.push_back(v.first);
+					}
+					
+					// find values of frequency one in each line and remove the possibility along this line of this value
+					// except the possibilities inside the current box:
+					
+					// for each line
+					for (int i_rel = 0; i_rel < mg.box_size(); ++i_rel) {
+						
+						// x-direction
+						// if the values occured in this line
+						for (value_t v : single_values_x) {
+							if (has_value(line_x_rel[i_rel], v)) {
+								
+								// for this line remove v from other boxes on this line
+								for (int i = 0; i < mg.box_size(); ++i) {
+									if (i == i_rel) continue;
+									
+									// for each cell in this line except the cells in this box
+									for (int y = 0; y < mg.size(); ++y) {
+										if (b_y * mg.box_size() <= y && y < (b_y + 1) * mg.box_size()) continue;
+										
+										std::vector<value_t>& vs = mg.get_cell(b_x * mg.box_size() + i_rel, y).get_values();
+										remove(vs, v);
+										
+									}
+								}
+							}
+						}
+						
+						// y-direction
+						// if the values occured in this line
+						for (value_t v : single_values_y) {
+							if (has_value(line_y_rel[i_rel], v)) {
+								
+								// for this line remove v from other boxes on this line
+								for (int i = 0; i < mg.box_size(); ++i) {
+									if (i == i_rel) continue;
+									
+									// for each cell in this line except the cells in this box
+									for (int x = 0; x < mg.size(); ++x) {
+										if (b_x * mg.box_size() <= x && x < (b_x + 1) * mg.box_size()) continue;
+										
+										std::vector<value_t>& vs = mg.get_cell(x, b_y * mg.box_size() + i_rel).get_values();
+										remove(vs, v);
+										
+									}
+								}
+							}
+						}
+						
+					}
+					
 				}
 			}
 			
