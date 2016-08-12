@@ -73,7 +73,7 @@ namespace sudoku_solver {
 		unsigned box_size = (unsigned int) (sqrt(double(size)));
 		
 		if (box_size*box_size != size) {
-			std::cout << "cannot create sudoku grid with size " << size << "(size must be a square)" << std::endl;
+			std::cout << "cannot create sudoku grid with size " << size << " (size must be a square)" << std::endl;
 			return;
 		}
 		
