@@ -102,7 +102,7 @@ namespace sudoku_solver {
 					
 					Multiple_Value_Cell& cell = mg.get_cell(x,y);
 					
-					if (!cell.is_final() && cell.get_values().size() == 1) {
+					if (!cell.is_final() && cell.possibilities() == 1) {
 						
 						// shortcuts to cell and sections
 						value_t v = cell.get_values()[0];
@@ -466,7 +466,7 @@ namespace sudoku_solver {
 				for (int x = 0; x < mg.size(); ++x) {
 					for (int y = 0; y < mg.size(); ++y) {
 						
-						if (mg.get_cell(x,y).get_values().size() == i) {
+						if (mg.get_cell(x,y).possibilities() == i) {
 							
 							// for each possible value in a non-final cell
 							for(value_t v : mg.get_cell(x,y).get_values()) {

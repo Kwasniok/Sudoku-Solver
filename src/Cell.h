@@ -66,6 +66,7 @@ namespace sudoku_solver {
 		void set_values(std::vector<value_t> vs);
 		std::vector<value_t>& get_values() {return _values;}
 		const std::vector<value_t>& get_values() const {return _values;}
+		size_t possibilities() const {return _values.size();}
 		value_t max_value() const;
 		
 		bool is_empty() const {return _values.empty();}
