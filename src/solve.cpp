@@ -21,15 +21,15 @@ namespace sudoku_solver {
 	//! special return type for _solve
 	struct _solve_ret_t {
 		Multiple_Value_Sudoku_Grid grid;
-		bool solved=false;
+		bool solved = false;
 		std::string reason;
 	};
 
 	//! recursive implementation of solving algoritm
 	_solve_ret_t _solve(Multiple_Value_Sudoku_Grid&& mg_start,
-						std::map<int, std::vector<value_t>> boxes, // stores the final values per box
-						std::map<int, std::vector<value_t>> lines_x, // stores the final values per line in x-direction
-						std::map<int, std::vector<value_t>> lines_y); // stores the final values per line in y-direction
+						std::map<int, std::vector<value_t>> boxes = {}, // stores the final values per box
+						std::map<int, std::vector<value_t>> lines_x = {}, // stores the final values per line in x-direction
+						std::map<int, std::vector<value_t>> lines_y = {}); // stores the final values per line in y-direction
 
 
 	
@@ -41,7 +41,7 @@ namespace sudoku_solver {
 		Multiple_Value_Sudoku_Grid mg {create_possibility_grid(sg_start)};
 		
 		// call to recursive solving algorithm
-		_solve_ret_t mg_solved = _solve(std::move(mg), {}, {}, {});
+		_solve_ret_t mg_solved = _solve(std::move(mg));
 		
 		// prints the reason why the solving algorithm finished
 		// either 'solved' or a contradiction message (e.g. 'same value in box')
@@ -474,7 +474,7 @@ namespace sudoku_solver {
 			
 			// for each possibility to cancle a non-final value
 			// (cells with fewer possibilities are chosen first)
-			for (int i=2; i <= mg.size(); ++i) {
+			for (int i = 2; i <= mg.size(); ++i) {
 				for (int x = 0; x < mg.size(); ++x) {
 					for (int y = 0; y < mg.size(); ++y) {
 						
