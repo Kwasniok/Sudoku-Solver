@@ -27,17 +27,17 @@ namespace sudoku_solver {
 
 	//! recursive implementation of solving algoritm
 	_solve_ret_t _solve(Multiple_Value_Sudoku_Grid&& mg_start,
-						std::map<int, std::vector<value_t>> boxes,
-						std::map<int, std::vector<value_t>> lines_x,
-						std::map<int, std::vector<value_t>> lines_y);
+						std::map<int, std::vector<value_t>> boxes, // stores the final values per box
+						std::map<int, std::vector<value_t>> lines_x, // stores the final values per line in x-direction
+						std::map<int, std::vector<value_t>> lines_y); // stores the final values per line in y-direction
 
 
 	
 	Multiple_Value_Sudoku_Grid solve(const Single_Value_Sudoku_Grid& sg_start) {
 		
-		// convert (single valued) sudoku grid into initial grid with multiple value support
-		// this new grid contains a sigle value for each original cell with a value
-		// and all possible values (e.g. 1-9 for a 9x9 grid) for each empty cell in the original
+		// convert (single valued) sudoku grid into initial grid with multiple-value support
+		// this new grid copies all values from its original and fills all blank cells
+		// with all possible values (e.g. 1-9 for a 9x9 grid)
 		Multiple_Value_Sudoku_Grid mg {create_possibility_grid(sg_start)};
 		
 		// call to recursive solving algorithm
@@ -63,18 +63,20 @@ namespace sudoku_solver {
 		//
 		// step I: (analytical part)
 		//
-		//    a: find final cells
-		//    a.a: find unchecked cells with only one possibility
+		//    a: find cells with one possibility only and finalize them
+		//    a.a: find non-final cells with only one possibility
 		//        for each such cell:
-		//            mark the value as used for its box and lines
+		//            mark the value as used for its segements (box and lines)
 		//            mark it as final
 		//    a.b: find single occurrence of a value in a section
-		//        makr those cells as final
-		//    both sub-steps might return with a contradiction
+		//        mark those cells as final
+		//    (Both sub-steps might return with a contradiction.)
 		//
 		//    b: cancel possibilities
-		//    b.a: cancel no longer possible values form all cells
+		//    b.a: cancel no longer possible values form all cells via marked-as-used values per section
 		//    b.b: cancles possibilities due to 'blocking' of a value whose position in one box is fixed to one line
+		//         (The position of the value is known for the line in one direction. It can be treated as if a final
+		//          value cancled the possibility of this value in the same line inside the other boxes.)
 		//
 		//
 		// step II: (assumption based part)
@@ -82,6 +84,7 @@ namespace sudoku_solver {
 		//    for each possibility in a non-final cell:
 		//        apply the solving algorithm to a copy with just one possibility cancled out
 		//    return (solved or contradictory) grid
+		//    (This brute force method complements the analytical step and is necessary for ambigous sudokus.)
 		//
 		
 		// decides whether step II is applied
@@ -89,14 +92,14 @@ namespace sudoku_solver {
 		// tracks the amount of removed possibilities (if it differs from 0 step I is repeated)
 		unsigned int removed_possibilities;
 		
-		// step I: analyzse and cancle possibilities
+		// step I: analyze and cancle possibilities
 		do {
 			grid_not_final = false;
 			removed_possibilities = 0;
 			
 			// Ia: analyze cells for final values (via box and lines)
 			
-			// Ia.a: find cell with one value left but not marked as final
+			// Ia.a: find cell with one possible value left which is not marked as final
 			for (int x = 0; x < mg.size(); ++x) {
 				for (int y = 0; y < mg.size(); ++y) {
 					
@@ -111,7 +114,7 @@ namespace sudoku_solver {
 						std::vector<value_t>& line_y = lines_y[y];
 						
 						// check for contradictions and stop if one occurred
-						// or store final value as used in section and continue
+						// or store final value as 'used' in section and continue
 						if(has_value(box, v))
 							return {std::move(mg), false, "same value in box"};
 						else
@@ -138,12 +141,16 @@ namespace sudoku_solver {
 			// for each value
 			for (value_t v = 1; v <= mg.size(); ++v) {
 				
+				// indicates weather the value v occurred just onnce in the current section
 				bool value_occurred_once;
+				// stores the position of that cell (only valid, if value_occurred_once is true)
 				int cell_pos_x, cell_pos_y;
 				
 				// by vertical line
 				for (int x = 0; x < mg.size(); ++x) {
 					
+					// if the value v does appear as final value in this section,
+					// there is no need to check for a single occurence
 					if (!has_value(lines_x[x], v)) {
 						
 						value_occurred_once = false;
@@ -195,6 +202,8 @@ namespace sudoku_solver {
 				// by horizontal line
 				for (int y = 0; y < mg.size(); ++y) {
 					
+					// if the value v does appear as final value in this section,
+					// there is no need to check for a single occurence
 					if (!has_value(lines_y[y], v)) {
 						
 						value_occurred_once = false;
@@ -246,6 +255,8 @@ namespace sudoku_solver {
 				// by box
 				for (int b = 0; b < mg.size() ; ++b) {
 					
+					// if the value v does appear as final value in this section,
+					// there is no need to check for a single occurence
 					if (!has_value(boxes[b], v)) {
 						
 						value_occurred_once = false;
@@ -315,7 +326,7 @@ namespace sudoku_solver {
 					// find non-final cell
 					if (!cell.is_final()) {
 						
-						// try to remove the values stored as used in all sections of the cell
+						// try to remove the values stored as used in all sections corresponding to the current cell
 						// if the remove was possible increment the counter
 						for (value_t v : boxes[mg.get_box_index(x, y)]) {
 							if (removed(cell_vs, v))
@@ -341,11 +352,12 @@ namespace sudoku_solver {
 				}
 			}
 			
-			// Ib.b cancles possibilities due to 'blocking' of a value whose position in one box is fixed to one line
-			// for each box
+			// Ib.b cancles possibilities due to 'blocking' of a value whose position in a box is fixed to one line
+			// apply this for each box
 			for (int b_x = 0; b_x < mg.box_size(); ++b_x) {
 				for (int b_y = 0; b_y < mg.box_size(); ++b_y) {
 					
+					// store all possible values in this box per line
 					std::vector<std::vector<value_t>> line_x_rel (mg.box_size());
 					std::vector<std::vector<value_t>> line_y_rel (mg.box_size());
 					
@@ -353,8 +365,10 @@ namespace sudoku_solver {
 					for (int x_rel = 0; x_rel < mg.box_size(); ++x_rel) {
 						for (int y_rel = 0; y_rel < mg.box_size(); ++y_rel) {
 							
+							//shortcut to current cell
 							Multiple_Value_Cell& c = mg.get_cell(b_x * mg.box_size() + x_rel, b_y * mg.box_size() + y_rel);
 							
+							// store the possible values per line
 							for (value_t v : c.get_values()) {
 								
 								if (!has_value(line_x_rel[x_rel], v))
@@ -366,7 +380,7 @@ namespace sudoku_solver {
 						}
 					}
 					
-					// histogramms to analyze the frequency of a value mapped onto lines
+					// histogramms to analyze the frequency of a value in a line
 					std::map<value_t, int> histogramm_x;
 					std::map<value_t, int> histogramm_y;
 					
@@ -453,10 +467,6 @@ namespace sudoku_solver {
 		// continue until analyzing and canceling results in no changes
 		} while (removed_possibilities != 0);
 		
-		
-		//TODO: need improved selection for assumptions
-		// too much (identical) choices
-		
 		// apply step II if necessary or return solved grid otherwise
 		if (grid_not_final) {
 			
@@ -491,11 +501,11 @@ namespace sudoku_solver {
 				}
 			}
 			
-			// checked all possibilities and found no solution
+			// contradiction: checked all possibilities and found no solution
 			return {std::move(mg), false, "no possibility left"};
 			
 		} else	{
-			// the grid is solved
+			// the grid is solved (all cells are final)
 			return {std::move(mg), true, "solved"};
 		}
 	}
