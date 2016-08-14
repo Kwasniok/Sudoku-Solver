@@ -411,7 +411,8 @@ namespace sudoku_solver {
 										if (b_y * mg.box_size() <= y && y < (b_y + 1) * mg.box_size()) continue;
 										
 										std::vector<value_t>& vs = mg.get_cell(b_x * mg.box_size() + i_rel, y).get_values();
-										remove(vs, v);
+										if (removed(vs, v))
+											++removed_possibilities;
 										
 									}
 								}
@@ -432,7 +433,8 @@ namespace sudoku_solver {
 										if (b_x * mg.box_size() <= x && x < (b_x + 1) * mg.box_size()) continue;
 										
 										std::vector<value_t>& vs = mg.get_cell(x, b_y * mg.box_size() + i_rel).get_values();
-										remove(vs, v);
+										if (removed(vs, v))
+											++removed_possibilities;
 										
 									}
 								}
